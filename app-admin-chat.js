@@ -191,7 +191,8 @@
     state.messages = [];
     loadMessages();
     if (state.pollTimer) clearInterval(state.pollTimer);
-    state.pollTimer = setInterval(loadMessages, 8000);
+    // [2026-04-29] 활성 채팅방 폴링 8초→3초 — 새 메시지 빨리 표시
+    state.pollTimer = setInterval(loadMessages, 3000);
   }
 
   async function sendReply() {
@@ -280,6 +281,7 @@
       var uid = parseInt(params.get("user_id") || "", 10);
       if (uid) openRoom(uid);
     });
-    state.listTimer = setInterval(loadList, 15000);
+    // [2026-04-29] 채팅방 목록 폴링 15초→8초 — 새 방·새 unread 빨리 인지
+    state.listTimer = setInterval(loadList, 8000);
   });
 })();

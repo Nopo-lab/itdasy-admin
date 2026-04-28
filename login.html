@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>잇데이 운영자 로그인</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-shell">
+    <form class="login-card" id="login-form" autocomplete="off">
+      <h1>잇데이 운영자</h1>
+      <p class="lead">운영자 권한 계정만 접근 가능합니다.</p>
+      <div class="login-error" id="err"></div>
+      <div class="form-row">
+        <label for="email">이메일</label>
+        <input type="email" id="email" required autocomplete="username" />
+      </div>
+      <div class="form-row">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn" id="login-btn" style="width:100%">로그인</button>
+      <p style="color:var(--text-2);font-size:11.5px;margin-top:18px;text-align:center;">
+        백엔드: <span id="api-base"></span>
+      </p>
+    </form>
+  </div>
+
+  <script src="app-admin-core.js"></script>
+  <script>
+    document.getElementById("api-base").textContent = AdminCore.API_BASE;
+    document.getElementById("login-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var err = document.getElementById("err");
+      err.style.display = "none";
+      var email = document.getElementById("email").value.trim();
+      var password = document.getElementById("password").value;
+      var btn = document.getElementById("login-btn");
+      btn.disabled = true;
+      btn.textContent = "로그인 중…";
+      try {
+        var res = await fetch(AdminCore.API_BASE + "/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ email: email, password: password }),
+        });
+        var data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || "로그인 실패");
+        }
+        AdminCore.setToken(data.access_token);
+        AdminCore.setAdminUser({ user_id: data.user_id, name: data.name, email: data.email });
+        location.href = "index.html";
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "로그인";
+      }
+    });
+  </script>
+</body>
+</html>

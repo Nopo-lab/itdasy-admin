@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>대시보드 · 잇데이 운영자</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <main class="main">
+      <h1 class="page-title">대시보드</h1>
+      <p class="page-sub">잇데이 운영 핵심 지표 — 오늘 / 이번주 / 이번달.</p>
+
+      <div class="kpi-grid" id="kpi-overview"></div>
+
+      <div class="section-grid">
+        <div class="card">
+          <div class="card-title">멤버십 분포</div>
+          <div class="chart-wrap"><canvas id="chart-membership"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">매출 추이 (이번달)</div>
+          <div class="chart-wrap"><canvas id="chart-revenue"></canvas></div>
+          <p id="revenue-summary" style="margin-top:10px;color:var(--text-1);font-size:13px"></p>
+        </div>
+      </div>
+      <div style="height:18px"></div>
+      <div class="kpi-grid" id="kpi-membership"></div>
+
+      <div style="height:8px"></div>
+      <h2 style="font-size:16px;margin:18px 0 10px">고객센터</h2>
+      <div class="kpi-grid" id="kpi-support"></div>
+    </main>
+  </div>
+
+  <script src="app-admin-core.js"></script>
+  <script src="app-admin-metrics.js"></script>
+  <script>
+    AdminCore.renderSidebar("dashboard");
+  </script>
+</body>
+</html>

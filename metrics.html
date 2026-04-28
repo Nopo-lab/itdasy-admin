@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>운영 메트릭 · 잇데이 운영자</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <main class="main">
+      <h1 class="page-title">운영 메트릭</h1>
+      <p class="page-sub">매출 · API 사용량 · Gemini 비용 · 멤버십 · 상담 통계.</p>
+
+      <div style="margin-bottom:18px;display:flex;gap:10px;align-items:center">
+        <label for="period-select" style="font-size:13px;color:var(--text-1);font-weight:600">기간</label>
+        <select id="period-select" style="background:var(--bg-2);color:var(--text-0);border:1px solid var(--line);border-radius:10px;padding:8px 12px">
+          <option value="day">오늘</option>
+          <option value="week">이번주</option>
+          <option value="month" selected>이번달</option>
+        </select>
+      </div>
+
+      <div class="kpi-grid" id="kpi-overview"></div>
+
+      <div class="section-grid">
+        <div class="card">
+          <div class="card-title">매출 추이 (KRW)</div>
+          <div class="chart-wrap"><canvas id="chart-revenue"></canvas></div>
+          <p id="revenue-summary" style="margin-top:10px;color:var(--text-1);font-size:13px"></p>
+        </div>
+        <div class="card">
+          <div class="card-title">멤버십 분포</div>
+          <div class="chart-wrap"><canvas id="chart-membership"></canvas></div>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+      <div class="kpi-grid" id="kpi-membership"></div>
+
+      <div style="height:8px"></div>
+
+      <div class="section-grid">
+        <div class="card">
+          <div class="card-title">API 호출 (엔드포인트별)</div>
+          <div class="chart-wrap"><canvas id="chart-api"></canvas></div>
+          <p id="api-summary" style="margin-top:10px;color:var(--text-1);font-size:13px"></p>
+        </div>
+        <div class="card">
+          <div class="card-title">Gemini 비용 추정 (USD)</div>
+          <div class="chart-wrap"><canvas id="chart-gemini"></canvas></div>
+          <p id="gemini-summary" style="margin-top:10px;color:var(--text-1);font-size:13px"></p>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+      <h2 style="font-size:16px;margin:18px 0 10px">상담 통계</h2>
+      <div class="kpi-grid" id="kpi-support"></div>
+    </main>
+  </div>
+
+  <script src="app-admin-core.js"></script>
+  <script src="app-admin-metrics.js"></script>
+  <script>
+    AdminCore.renderSidebar("metrics");
+  </script>
+</body>
+</html>

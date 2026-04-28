@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1280" />
+    <title>잇데이 운영 — 추가 메트릭</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar"></aside>
+      <main class="main">
+        <header class="page-head">
+          <h1>추가 운영 메트릭</h1>
+          <p class="page-sub">결제 전환율 · 예상 월 비용 · 저장소 · 사용자 활성도</p>
+        </header>
+        <div id="metrics-extras"></div>
+      </main>
+    </div>
+    <script src="app-admin-core.js"></script>
+    <script>
+      // 사이드바 메뉴 — 운영 메트릭 항목을 활성화. 핵심 dashboard 와 충돌 없음.
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.AdminCore && window.AdminCore.renderSidebar) {
+          window.AdminCore.renderSidebar("metrics");
+        }
+      });
+    </script>
+    <script src="metrics-extras.js"></script>
+  </body>
+</html>

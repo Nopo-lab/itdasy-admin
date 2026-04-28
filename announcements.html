@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>공지 발송 · 잇데이 운영자</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <main class="main">
+      <h1 class="page-title">공지 발송</h1>
+      <p class="page-sub">대상 사용자에게 in-app 알림 + FCM 푸시를 일괄 발송합니다.</p>
+
+      <div class="card" style="max-width:680px">
+        <div class="form-row">
+          <label for="a-target">대상</label>
+          <select id="a-target">
+            <option value="all">전체 활성 사용자</option>
+            <option value="paid">유료 (Pro/Premium)</option>
+            <option value="free">Free 사용자</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="a-title">제목 (최대 80자)</label>
+          <input type="text" id="a-title" maxlength="80" placeholder="예: 잇데이 v1.4 업데이트 안내" />
+        </div>
+        <div class="form-row">
+          <label for="a-body">본문 (최대 1500자)</label>
+          <textarea id="a-body" maxlength="1500" placeholder="공지 내용을 입력하세요. 줄바꿈 허용."></textarea>
+        </div>
+        <button class="btn" id="a-send">발송</button>
+        <p style="margin-top:12px;font-size:12px;color:var(--text-2)">
+          ⚠ 발송 후 취소가 불가능합니다. 한 번 더 확인하세요.
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script src="app-admin-core.js"></script>
+  <script src="app-admin-announce.js"></script>
+  <script>
+    AdminCore.renderSidebar("announce");
+  </script>
+</body>
+</html>

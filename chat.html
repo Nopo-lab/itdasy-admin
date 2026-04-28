@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>채팅방 · 잇데이 운영자</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <main class="main">
+      <h1 class="page-title">채팅방</h1>
+      <p class="page-sub">사용자가 보낸 고객센터 메시지·신고에 답장하세요. <strong style="color:var(--brand)">Cmd/Ctrl+Enter</strong> 로 전송.</p>
+
+      <label style="display:flex;gap:6px;align-items:center;margin-bottom:10px;font-size:13px;color:var(--text-1)">
+        <input type="checkbox" id="filter-unread" /> 미읽음만 보기
+      </label>
+
+      <div class="chat-shell">
+        <div class="chat-list">
+          <div class="chat-list-search">
+            <input type="text" placeholder="검색은 아직 미지원 (목록에서 클릭)" disabled />
+          </div>
+          <div id="chat-list-body"></div>
+        </div>
+        <div class="chat-pane">
+          <div class="chat-head" id="chat-head">사용자를 선택하세요</div>
+          <div class="chat-body" id="chat-body">
+            <div class="empty">좌측에서 채팅방을 선택하면 메시지가 표시됩니다.</div>
+          </div>
+          <div class="chat-input">
+            <textarea id="reply-input" placeholder="답장 입력… (Cmd/Ctrl+Enter 전송)" disabled></textarea>
+            <button id="reply-btn" disabled>전송</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app-admin-core.js"></script>
+  <script src="app-admin-chat.js"></script>
+  <script>
+    AdminCore.renderSidebar("chat");
+  </script>
+</body>
+</html>

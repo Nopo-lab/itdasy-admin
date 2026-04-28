@@ -208,6 +208,107 @@ button {
   grid-template-columns: 1fr 1fr;
 }
 
+.ops-section {
+  margin-bottom: 22px;
+}
+
+.ops-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.ops-head h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.ops-head p {
+  margin: 3px 0 0;
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.ops-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.status-card {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 15px;
+}
+
+.status-card.ok {
+  border-color: rgba(110, 231, 183, 0.34);
+}
+
+.status-card.warn {
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+.status-card.bad {
+  border-color: rgba(251, 113, 133, 0.5);
+}
+
+.status-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 20px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-2);
+  flex: 0 0 auto;
+}
+
+.status-card.ok .status-dot {
+  background: var(--ok);
+}
+
+.status-card.warn .status-dot {
+  background: var(--warn);
+}
+
+.status-card.bad .status-dot {
+  background: var(--bad);
+}
+
+.status-title {
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.status-link {
+  margin-left: auto;
+  font-size: 11px;
+}
+
+.status-main {
+  margin-top: 9px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.status-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--text-2);
+  word-break: break-word;
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 64px 1fr;
@@ -218,6 +319,10 @@ button {
   }
   .section-grid {
     grid-template-columns: 1fr;
+  }
+  .ops-head {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
@@ -245,6 +350,79 @@ button {
 
 .tbl tbody tr:hover {
   background: var(--bg-2);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.muted-cell {
+  color: var(--text-2);
+  text-align: center;
+}
+
+.error-cell {
+  color: var(--bad);
+}
+
+.table-action {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-0);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-1);
+  background: var(--bg-2);
+}
+
+.pill.ok {
+  color: var(--ok);
+  border-color: rgba(110, 231, 183, 0.35);
+}
+
+.pill.warn {
+  color: var(--warn);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.pill.bad {
+  color: var(--bad);
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
+.pill.brand {
+  color: var(--brand);
+  border-color: rgba(241, 128, 145, 0.42);
+  background: var(--brand-soft);
+}
+
+.user-tools {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 130px auto auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.user-tools .form-row {
+  margin-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .user-tools {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── 채팅 레이아웃 ── */
@@ -487,6 +665,19 @@ button {
   resize: vertical;
 }
 
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--text-1);
+  font-size: 12px;
+  margin: 2px 0 14px;
+}
+
+.check-row input {
+  margin-top: 3px;
+}
+
 .btn {
   background: var(--brand);
   color: #fff;
@@ -506,6 +697,48 @@ button {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.announce-grid {
+  align-items: start;
+}
+
+.announce-preview {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  min-height: 180px;
+}
+
+.preview-target {
+  display: inline-flex;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.announce-preview h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.announce-preview p {
+  margin: 0;
+  color: var(--text-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.safety-note {
+  margin-top: 12px;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 /* ── 로그인 ── */

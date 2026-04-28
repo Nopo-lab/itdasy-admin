@@ -162,6 +162,9 @@
       (activeId === "chat" ? " active" : "") +
       '" href="chat.html"><span>채팅방</span></a>' +
       '<a class="nav-link' +
+      (activeId === "users" ? " active" : "") +
+      '" href="users.html"><span>사용자</span></a>' +
+      '<a class="nav-link' +
       (activeId === "announce" ? " active" : "") +
       '" href="announcements.html"><span>공지 발송</span></a>' +
       '<a class="nav-link' +

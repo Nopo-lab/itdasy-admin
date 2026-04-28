@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>공지 발송 · 잇데이 운영자</title>
-  <link rel="stylesheet" href="style.css?v=20260429-speed1" />
+  <link rel="stylesheet" href="style.css?v=20260429-admin-plan1" />
 </head>
 <body>
   <div class="layout">
@@ -13,33 +13,51 @@
       <h1 class="page-title">공지 발송</h1>
       <p class="page-sub">대상 사용자에게 in-app 알림 + FCM 푸시를 일괄 발송합니다.</p>
 
-      <div class="card" style="max-width:680px">
-        <div class="form-row">
-          <label for="a-target">대상</label>
-          <select id="a-target">
-            <option value="all">전체 활성 사용자</option>
-            <option value="paid">유료 (Pro/Premium)</option>
-            <option value="free">Free 사용자</option>
-          </select>
+      <div class="section-grid announce-grid">
+        <div class="card">
+          <div class="form-row">
+            <label for="a-target">대상</label>
+            <select id="a-target">
+              <option value="all">전체 활성 사용자</option>
+              <option value="paid">유료 (Pro/Premium)</option>
+              <option value="free">Free 사용자</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="a-title">제목 (최대 80자)</label>
+            <input type="text" id="a-title" maxlength="80" placeholder="예: 잇데이 v1.4 업데이트 안내" />
+          </div>
+          <div class="form-row">
+            <label for="a-body">본문 (최대 1500자)</label>
+            <textarea id="a-body" maxlength="1500" placeholder="공지 내용을 입력하세요. 줄바꿈 허용."></textarea>
+          </div>
+          <label class="check-row">
+            <input type="checkbox" id="a-confirm" />
+            <span>발송 후 취소가 어렵다는 것을 확인했습니다.</span>
+          </label>
+          <button class="btn" id="a-send">발송</button>
+          <p style="margin-top:12px;font-size:12px;color:var(--text-2)">
+            전체 발송은 모든 활성 사용자에게 in-app 알림과 푸시가 전달됩니다.
+          </p>
         </div>
-        <div class="form-row">
-          <label for="a-title">제목 (최대 80자)</label>
-          <input type="text" id="a-title" maxlength="80" placeholder="예: 잇데이 v1.4 업데이트 안내" />
+
+        <div class="card">
+          <div class="card-title">발송 전 미리보기</div>
+          <div class="announce-preview">
+            <div class="preview-target" id="a-preview-target">전체 활성 사용자</div>
+            <h2 id="a-preview-title">제목이 여기에 표시됩니다.</h2>
+            <p id="a-preview-body">본문이 여기에 표시됩니다.</p>
+          </div>
+          <div class="safety-note">
+            짧은 장애 안내도 발송 이력에 남습니다. 개인정보나 내부 토큰은 공지에 넣지 마세요.
+          </div>
         </div>
-        <div class="form-row">
-          <label for="a-body">본문 (최대 1500자)</label>
-          <textarea id="a-body" maxlength="1500" placeholder="공지 내용을 입력하세요. 줄바꿈 허용."></textarea>
-        </div>
-        <button class="btn" id="a-send">발송</button>
-        <p style="margin-top:12px;font-size:12px;color:var(--text-2)">
-          ⚠ 발송 후 취소가 불가능합니다. 한 번 더 확인하세요.
-        </p>
       </div>
     </main>
   </div>
 
-  <script src="app-admin-core.js?v=20260429-speed1"></script>
-  <script src="app-admin-announce.js?v=20260429-speed1"></script>
+  <script src="app-admin-core.js?v=20260429-admin-plan1"></script>
+  <script src="app-admin-announce.js?v=20260429-admin-plan1"></script>
   <script>
     AdminCore.renderSidebar("announce");
   </script>

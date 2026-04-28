@@ -180,6 +180,12 @@
     Array.prototype.forEach.call(document.querySelectorAll(".chat-room"), function (el) {
       el.classList.toggle("active", parseInt(el.getAttribute("data-uid"), 10) === uid);
     });
+    var info = state.rooms.find(function (r) {
+      return r.user_id === uid;
+    });
+    if (!info) {
+      $("#chat-head").textContent = "user#" + uid;
+    }
     $("#reply-input").disabled = false;
     $("#reply-btn").disabled = false;
     state.messages = [];
@@ -269,7 +275,11 @@
   window.addEventListener("DOMContentLoaded", function () {
     if (!AdminCore.getToken()) return;
     bind();
-    loadList();
+    loadList().then(function () {
+      var params = new URLSearchParams(location.search);
+      var uid = parseInt(params.get("user_id") || "", 10);
+      if (uid) openRoom(uid);
+    });
     state.listTimer = setInterval(loadList, 15000);
   });
 })();

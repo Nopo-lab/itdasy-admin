@@ -18,15 +18,19 @@
     }
     var btn = $("#a-send");
     btn.disabled = true;
-    btn.textContent = "발송 중…";
+    btn.textContent = "요청 중…";
     try {
       var r = await AdminCore.api("/admin/announcements", {
         method: "POST",
         body: { title: title, body: body, target: target },
       });
-      AdminCore.toast(
-        "발송 완료 — in-app " + r.inserted + "건 / 푸시 " + r.pushed + "건"
-      );
+      if (r.queued_push) {
+        AdminCore.toast("공지 등록 완료 — in-app " + r.inserted + "건 / 푸시는 백그라운드 발송 중");
+      } else {
+        AdminCore.toast(
+          "발송 완료 — in-app " + r.inserted + "건 / 푸시 " + r.pushed + "건"
+        );
+      }
       $("#a-title").value = "";
       $("#a-body").value = "";
     } catch (e) {

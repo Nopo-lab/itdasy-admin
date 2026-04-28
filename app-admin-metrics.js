@@ -5,6 +5,11 @@
     return document.querySelector(s);
   };
   var charts = {};
+  var state = {
+    requestId: 0,
+    errorShown: false,
+  };
+  var CACHE_PREFIX = "itdasy_admin_metrics_cache_v2:";
 
   function destroy(key) {
     if (charts[key]) {
@@ -88,26 +93,71 @@
     });
   }
 
-  async function loadAll() {
-    var period = $("#period-select") ? $("#period-select").value : "month";
+  function cacheKey(period) {
+    return CACHE_PREFIX + period;
+  }
+
+  function readCache(period) {
     try {
-      var [overview, members, revenue, api, gem, support] = await Promise.all([
-        AdminCore.api("/admin/stats/overview"),
-        AdminCore.api("/admin/stats/memberships"),
-        AdminCore.api("/admin/stats/revenue?period=" + period),
-        AdminCore.api("/admin/stats/api-usage?period=" + period),
-        AdminCore.api("/admin/stats/gemini-cost?period=" + period),
-        AdminCore.api("/admin/stats/support-tickets?period=" + period),
-      ]);
-      renderOverview(overview);
-      renderMembership(members);
-      renderRevenue(revenue);
-      renderApiUsage(api);
-      renderGemini(gem);
-      renderSupport(support);
+      var raw = localStorage.getItem(cacheKey(period));
+      return raw ? JSON.parse(raw) : {};
     } catch (e) {
-      AdminCore.toast(e.message, { error: true });
+      return {};
     }
+  }
+
+  function writeCache(period, section, data) {
+    try {
+      var cached = readCache(period);
+      cached[section] = data;
+      cached.updated_at = new Date().toISOString();
+      localStorage.setItem(cacheKey(period), JSON.stringify(cached));
+    } catch (e) {}
+  }
+
+  function renderSection(section, data) {
+    if (section === "overview") renderOverview(data);
+    if (section === "members") renderMembership(data);
+    if (section === "revenue") renderRevenue(data);
+    if (section === "api") renderApiUsage(data);
+    if (section === "gem") renderGemini(data);
+    if (section === "support") renderSupport(data);
+  }
+
+  function renderCached(period) {
+    var cached = readCache(period);
+    ["overview", "members", "revenue", "api", "gem", "support"].forEach(function (section) {
+      if (cached[section]) renderSection(section, cached[section]);
+    });
+  }
+
+  function fetchSection(requestId, period, section, path) {
+    AdminCore.api(path)
+      .then(function (data) {
+        if (requestId !== state.requestId) return;
+        renderSection(section, data);
+        writeCache(period, section, data);
+      })
+      .catch(function (e) {
+        if (requestId !== state.requestId) return;
+        if (!state.errorShown) {
+          state.errorShown = true;
+          AdminCore.toast(e.message, { error: true });
+        }
+      });
+  }
+
+  function loadAll() {
+    var period = $("#period-select") ? $("#period-select").value : "month";
+    var requestId = ++state.requestId;
+    state.errorShown = false;
+    renderCached(period);
+    fetchSection(requestId, period, "overview", "/admin/stats/overview");
+    fetchSection(requestId, period, "members", "/admin/stats/memberships");
+    fetchSection(requestId, period, "revenue", "/admin/stats/revenue?period=" + period);
+    fetchSection(requestId, period, "api", "/admin/stats/api-usage?period=" + period);
+    fetchSection(requestId, period, "gem", "/admin/stats/gemini-cost?period=" + period);
+    fetchSection(requestId, period, "support", "/admin/stats/support-tickets?period=" + period);
   }
 
   function renderOverview(o) {

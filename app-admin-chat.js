@@ -6,14 +6,64 @@
   };
   var state = {
     rooms: [],
+    messages: [],
+    pendingByUser: {},
     activeUserId: null,
     pollTimer: null,
     listTimer: null,
+    sending: false,
   };
 
   function avatarLabel(name, email) {
     var s = (name || email || "?").trim();
     return s.charAt(0).toUpperCase();
+  }
+
+  function latestPending(uid) {
+    var pending = state.pendingByUser[uid] || [];
+    return pending.length ? pending[pending.length - 1] : null;
+  }
+
+  function mergePendingRooms(rooms) {
+    return (rooms || [])
+      .map(function (room) {
+        var pending = latestPending(room.user_id);
+        if (!pending) return room;
+        return Object.assign({}, room, {
+          last_message: pending.content,
+          last_at: pending.created_at,
+        });
+      })
+      .sort(function (a, b) {
+        return new Date(b.last_at || 0) - new Date(a.last_at || 0);
+      });
+  }
+
+  function updateRoomPreview(uid, text, at) {
+    var found = false;
+    state.rooms = state.rooms.map(function (room) {
+      if (room.user_id !== uid) return room;
+      found = true;
+      return Object.assign({}, room, {
+        last_message: text,
+        last_at: at,
+        unread: 0,
+      });
+    });
+    if (!found) {
+      state.rooms.unshift({
+        user_id: uid,
+        user_name: null,
+        user_email: "user#" + uid,
+        last_message: text,
+        last_at: at,
+        unread: 0,
+      });
+    }
+    state.rooms.sort(function (a, b) {
+      return new Date(b.last_at || 0) - new Date(a.last_at || 0);
+    });
+    renderList(state.rooms);
   }
 
   function renderList(rooms) {
@@ -68,13 +118,18 @@
         (roomInfo.user_email || "user#" + roomInfo.user_id);
     }
     var body = $("#chat-body");
-    if (!msgs || !msgs.length) {
+    var pending = state.pendingByUser[state.activeUserId] || [];
+    var merged = (msgs || []).concat(pending);
+    if (!merged.length) {
       body.innerHTML = '<div class="empty">메시지 없음</div>';
       return;
     }
-    var html = msgs
+    var html = merged
       .map(function (m) {
         var cls = m.from_admin ? "bubble admin" : "bubble user";
+        if (m.pending) cls += " pending";
+        if (m.failed) cls += " failed";
+        var status = m.failed ? " · 실패" : m.pending ? " · 전송 중" : "";
         return (
           '<div class="' +
           cls +
@@ -82,6 +137,7 @@
           AdminCore.escapeHtml(m.content) +
           "<time>" +
           AdminCore.fmtDate(m.created_at) +
+          status +
           "</time>" +
           "</div>"
         );
@@ -94,7 +150,7 @@
   async function loadList() {
     try {
       var rooms = await AdminCore.api("/admin/chats");
-      state.rooms = rooms || [];
+      state.rooms = mergePendingRooms(rooms || []);
       renderList(state.rooms);
     } catch (e) {
       AdminCore.toast(e.message, { error: true });
@@ -103,14 +159,17 @@
 
   async function loadMessages() {
     if (!state.activeUserId) return;
+    var uid = state.activeUserId;
     try {
       var msgs = await AdminCore.api(
-        "/admin/chats/" + state.activeUserId + "/messages?limit=100"
+        "/admin/chats/" + uid + "/messages?limit=100"
       );
+      if (uid !== state.activeUserId) return;
+      state.messages = msgs || [];
       var info = state.rooms.find(function (r) {
         return r.user_id === state.activeUserId;
       });
-      renderMessages(msgs, info);
+      renderMessages(state.messages, info);
     } catch (e) {
       AdminCore.toast(e.message, { error: true });
     }
@@ -123,6 +182,7 @@
     });
     $("#reply-input").disabled = false;
     $("#reply-btn").disabled = false;
+    state.messages = [];
     loadMessages();
     if (state.pollTimer) clearInterval(state.pollTimer);
     state.pollTimer = setInterval(loadMessages, 8000);
@@ -132,21 +192,59 @@
     var inp = $("#reply-input");
     var btn = $("#reply-btn");
     var text = (inp.value || "").trim();
-    if (!text || !state.activeUserId) return;
+    if (!text || !state.activeUserId || state.sending) return;
+    var uid = state.activeUserId;
+    var tempId = "tmp-" + Date.now();
+    var nowIso = new Date().toISOString();
+    var temp = {
+      id: tempId,
+      from_admin: true,
+      content: text,
+      created_at: nowIso,
+      read: false,
+      pending: true,
+    };
+    state.sending = true;
     btn.disabled = true;
+    inp.value = "";
+    state.pendingByUser[uid] = (state.pendingByUser[uid] || []).concat([temp]);
+    updateRoomPreview(uid, text, nowIso);
+    renderMessages(state.messages, state.rooms.find(function (r) { return r.user_id === uid; }));
     try {
-      await AdminCore.api("/admin/chats/" + state.activeUserId + "/reply", {
+      var saved = await AdminCore.api("/admin/chats/" + uid + "/reply", {
         method: "POST",
         body: { content: text },
       });
-      inp.value = "";
-      await loadMessages();
-      await loadList();
+      state.pendingByUser[uid] = (state.pendingByUser[uid] || []).filter(function (m) {
+        return m.id !== tempId;
+      });
+      if (state.activeUserId === uid) {
+        state.messages = state.messages
+          .filter(function (m) {
+            return m.id !== saved.id;
+          })
+          .concat([saved]);
+        renderMessages(state.messages, state.rooms.find(function (r) { return r.user_id === uid; }));
+      }
+      updateRoomPreview(uid, saved.content, saved.created_at);
+      loadList();
+      setTimeout(function () {
+        if (state.activeUserId === uid) loadMessages();
+      }, 350);
       AdminCore.toast("답장 전송 완료");
     } catch (e) {
+      state.pendingByUser[uid] = (state.pendingByUser[uid] || []).map(function (m) {
+        if (m.id !== tempId) return m;
+        return Object.assign({}, m, { pending: false, failed: true });
+      });
+      if (!inp.value.trim()) inp.value = text;
+      if (state.activeUserId === uid) {
+        renderMessages(state.messages, state.rooms.find(function (r) { return r.user_id === uid; }));
+      }
       AdminCore.toast(e.message, { error: true });
     } finally {
-      btn.disabled = false;
+      state.sending = false;
+      btn.disabled = !state.activeUserId;
       inp.focus();
     }
   }
@@ -162,7 +260,7 @@
     $("#filter-unread").addEventListener("change", function (e) {
       var val = e.target.checked ? "true" : "all";
       AdminCore.api("/admin/chats?has_unread=" + val).then(function (rooms) {
-        state.rooms = rooms || [];
+        state.rooms = mergePendingRooms(rooms || []);
         renderList(state.rooms);
       });
     });

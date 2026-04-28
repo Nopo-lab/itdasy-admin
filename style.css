@@ -397,6 +397,15 @@ button {
   border-bottom-right-radius: 4px;
 }
 
+.bubble.pending {
+  opacity: 0.72;
+}
+
+.bubble.failed {
+  background: var(--bad);
+  opacity: 0.95;
+}
+
 .bubble time {
   display: block;
   font-size: 10.5px;

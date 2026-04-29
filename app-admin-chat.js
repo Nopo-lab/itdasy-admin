@@ -273,6 +273,47 @@
     });
   }
 
+  // [2026-04-29 W7] WebSocket 실시간 — 폴링 fallback 유지
+  function _connectWs() {
+    if (!AdminCore.getToken()) return null;
+    var wsUrl = AdminCore.API_BASE.replace(/^https?:/, AdminCore.API_BASE.indexOf('https') === 0 ? 'wss:' : 'ws:')
+      + '/admin/ws?token=' + encodeURIComponent(AdminCore.getToken());
+    var ws;
+    try { ws = new WebSocket(wsUrl); } catch (e) { console.warn('[admin-ws] 연결 실패', e); return null; }
+    ws.onopen = function () { console.log('[admin-ws] connected'); };
+    ws.onmessage = function (e) {
+      try {
+        var data = JSON.parse(e.data);
+        if (data.kind === 'user_msg') {
+          loadList();
+          if (state.activeUserId === data.user_id) {
+            state.messages.push({
+              id: data.message_id, from_admin: false, content: data.content,
+              created_at: data.created_at, read: false,
+            });
+            renderMessages(state.messages, state.rooms.find(function (r) { return r.user_id === data.user_id; }));
+          }
+          if (window.navigator.vibrate) window.navigator.vibrate(50);
+        } else if (data.kind === 'admin_reply') {
+          if (state.activeUserId === data.user_id) {
+            state.messages.push({
+              id: data.message_id, from_admin: true, content: data.content,
+              created_at: data.created_at, read: true,
+            });
+            renderMessages(state.messages, state.rooms.find(function (r) { return r.user_id === data.user_id; }));
+          }
+          loadList();
+        }
+      } catch (_) { /* ignore */ }
+    };
+    ws.onclose = function () { setTimeout(_connectWs, 5000); };
+    ws.onerror = function (e) { console.warn('[admin-ws] error', e); };
+    setInterval(function () {
+      try { if (ws.readyState === 1) ws.send(JSON.stringify({ kind: 'ping' })); } catch (_) { /* ignore */ }
+    }, 30000);
+    return ws;
+  }
+
   window.addEventListener("DOMContentLoaded", function () {
     if (!AdminCore.getToken()) return;
     bind();
@@ -281,7 +322,9 @@
       var uid = parseInt(params.get("user_id") || "", 10);
       if (uid) openRoom(uid);
     });
-    // [2026-04-29] 채팅방 목록 폴링 15초→8초 — 새 방·새 unread 빨리 인지
+    // [2026-04-29] 채팅방 목록 폴링 — WebSocket 실시간 + fallback (15초→8초)
     state.listTimer = setInterval(loadList, 8000);
+    // [2026-04-29 W7] WebSocket 실시간 연결
+    _connectWs();
   });
 })();

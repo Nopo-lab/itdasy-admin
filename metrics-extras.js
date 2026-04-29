@@ -114,7 +114,48 @@
     c4.appendChild(el("div", { class: "mx-sub", id: "mx-act-extra" }, ""));
     grid.appendChild(c4);
 
+    // [2026-04-29 W5] 5) 직원·회원권 (시장 진입 지표)
+    var c5 = el("section", { class: "mx-card", id: "mx-staff-mem" });
+    c5.appendChild(el("h3", { class: "mx-h" }, "직원 · 회원권"));
+    var smRow = el("div", { class: "mx-stat-row" });
+    [
+      { k: "직원", id: "mx-sm-staff" },
+      { k: "활성회원권", id: "mx-sm-mem" },
+      { k: "총잔액", id: "mx-sm-bal" },
+    ].forEach(function (item) {
+      var box = el("div", { class: "mx-stat" });
+      box.appendChild(el("div", { class: "mx-stat-k" }, item.k));
+      box.appendChild(el("div", { class: "mx-stat-v", id: item.id }, "—"));
+      smRow.appendChild(box);
+    });
+    c5.appendChild(smRow);
+    c5.appendChild(el("div", { class: "mx-sub", id: "mx-sm-extra" }, ""));
+    grid.appendChild(c5);
+
     injectStyles();
+  }
+
+  async function loadStaffMembership() {
+    try {
+      var d = await window.AdminCore.api("/admin/stats/staff-membership");
+      document.getElementById("mx-sm-staff").textContent =
+        window.AdminCore.fmtNum(d.active_staff || 0) +
+        "명";
+      document.getElementById("mx-sm-mem").textContent =
+        window.AdminCore.fmtNum(d.total_memberships || 0) +
+        "명";
+      document.getElementById("mx-sm-bal").textContent =
+        window.AdminCore.fmtKRW(d.total_membership_balance || 0);
+      document.getElementById("mx-sm-extra").textContent =
+        "샵 " +
+        (d.users_with_staff || 0) +
+        "곳에서 직원 등록 · 30일 내 만료 " +
+        (d.expiring_30d || 0) +
+        "건 · 평균 잔액 " +
+        window.AdminCore.fmtKRW(d.avg_balance || 0);
+    } catch (e) {
+      document.getElementById("mx-sm-extra").textContent = "직원·회원권 조회 실패";
+    }
   }
 
   function injectStyles() {
@@ -288,6 +329,7 @@
     loadCost();
     loadStorage();
     loadActivity();
+    loadStaffMembership();
   }
 
   if (document.readyState === "loading") {

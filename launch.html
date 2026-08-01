@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1280" />
+    <title>잇데이 운영 — 출시 첫날</title>
+    <link rel="stylesheet" href="style.css?v=20260731-launch1" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar"></aside>
+      <main class="main">
+        <header class="page-head">
+          <h1>출시 첫날</h1>
+          <p class="page-sub" id="launch-sub">
+            5~10분마다 새로고침하며 사고를 잡는 화면 · 자동 갱신 5분
+          </p>
+        </header>
+        <div id="launch-root"></div>
+      </main>
+    </div>
+    <script src="app-admin-core.js?v=20260731-launch1"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.AdminCore && window.AdminCore.renderSidebar) {
+          window.AdminCore.renderSidebar("launch");
+        }
+      });
+    </script>
+    <script src="launch.js?v=20260731-launch1"></script>
+  </body>
+</html>

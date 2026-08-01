@@ -3,7 +3,12 @@
   "use strict";
 
   // 백엔드 — 스테이징 기본. 운영자 본인이 본 화면 쓰면 production 으로 바꿔도 됨.
-  var DEFAULT_API = "https://itdasy260417-staging-production.up.railway.app";
+  // [출시감사 2026-07-31] Railway → Cloud Run. 옛 주소는 **404 를 반환한다**(실측) —
+  //   백엔드를 Cloud Run(asia-northeast3)으로 옮길 때 이 admin 앱이 안 따라와서
+  //   localStorage 에 itdasy_admin_api_base 를 직접 넣어두지 않은 브라우저에선
+  //   admin 화면 전체가 동작하지 않는 상태였다.
+  var DEFAULT_API =
+    "https://itdasy-backend-staging-644329093453.asia-northeast3.run.app";
   var API_BASE = (function () {
     try {
       var stored = localStorage.getItem("itdasy_admin_api_base");
@@ -170,6 +175,11 @@
       '<a class="nav-link' +
       (activeId === "metrics" ? " active" : "") +
       '" href="metrics.html"><span>운영 메트릭</span></a>' +
+      // [출시감사 2026-07-31] 출시 첫날용 — 5분마다 보면서 사고를 잡는 화면.
+      //   기존 '운영 메트릭'은 사업 지표(전환율·매출) 중심이라 장애 감지엔 안 맞는다.
+      '<a class="nav-link' +
+      (activeId === "launch" ? " active" : "") +
+      '" href="launch.html"><span>🚀 출시 첫날</span></a>' +
       '<div class="sidebar-foot">' +
       '<div id="admin-who"></div>' +
       '<button id="logout-btn">로그아웃</button>' +
